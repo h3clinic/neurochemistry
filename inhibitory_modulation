@@ -1,0 +1,171 @@
+neurochemistry/
+    README.md
+    inhibitory/
+        README.md
+        inhibitory_baseline_params.md
+        inhibitory_params.py
+# neurochemistry
+This repository contains modular components for the Quesify Neurochemistry project.
+Each subdirectory is owned by a specific modeling role and must remain
+scope-isolated (e.g., inhibitory vs excitatory parameters).
+
+# Inhibitory Modulation
+
+This directory contains **GABAergic inhibitory parameters only**.
+
+## Allowed
+- GABA_A synaptic conductance
+- Inhibitory decay time constants
+- Inhibitory noise or gain parameters
+
+## Not Allowed
+- AMPA
+- NMDA
+- Any excitatory synaptic parameters
+# Inhibitory Baseline Parameters
+
+This document defines baseline inhibitory parameters for cortical network models.
+All parameters are restricted to GABAergic inhibition and are justified by
+peer-reviewed modeling and synaptic kinetics literature saved in Zotero.
+
+Each referenced paper includes the Zotero note:
+“This paper justifies inhibitory conductance or decay constants used in our model.”
+
+---
+
+## GABA_A Synaptic Conductance
+
+**Parameter:** `g_GABA_max`  
+**Baseline value:** 0.1 mS/cm²  
+
+**Rationale:**  
+Computational models of cortical and hippocampal inhibitory networks commonly
+use peak GABA_A conductances on the order of 0.05–0.2 mS/cm² to produce stable
+inhibitory suppression and synchronized network activity.
+
+---
+
+## Inhibitory Synaptic Decay Constants
+
+### Fast Component
+**Parameter:** `tau_GABA_fast`  
+**Baseline range:** 1.2–1.8 ms  
+
+**Rationale:**  
+Fast inhibitory postsynaptic currents (IPSCs), typically associated with
+interneuron-mediated inhibition, exhibit decay constants in this range in
+modeling and experimental studies.
+
+### Slow Component
+**Parameter:** `tau_GABA_slow`  
+**Baseline value:** ~8 ms  
+
+**Rationale:**  
+A slower inhibitory decay component captures prolonged inhibitory integration
+commonly used in cortical network models and improves stability of inhibitory
+suppression.
+
+---
+
+## Intended Use
+
+These parameters define the **baseline inhibitory state** of the model.
+Perturbations applied elsewhere in the project should scale or modify these
+values without introducing excitatory parameters.
+
+"""
+Inhibitory baseline parameters for cortical network models.
+
+This module defines GABAergic inhibitory parameters only.
+No excitatory (AMPA/NMDA) parameters are included by design.
+
+Literature justification is documented in:
+inhibitory_baseline_params.md
+
+Role: Inhibitory Modulation Lead
+Project: Predicting Emergent Synaptic Failure in Human Cortical Networks Using Nonlinear Multiscale Modeling of Low-Dose Neuroactive Compounds
+"""
+
+# =====================================================
+# GABA_A SYNAPTIC CONDUCTANCE
+# =====================================================
+
+# Peak GABA_A synaptic conductance
+# Units: mS/cm^2
+G_GABA_MAX = 0.1
+
+
+# =====================================================
+# INHIBITORY DECAY TIME CONSTANTS
+# =====================================================
+
+# Fast inhibitory decay component (interneuron-mediated)
+# Units: ms
+TAU_GABA_FAST_MIN = 1.2
+TAU_GABA_FAST_MAX = 1.8
+
+# Slow inhibitory decay component
+# Units: ms
+TAU_GABA_SLOW = 8.0
+
+
+# =====================================================
+# ACCESSOR FUNCTIONS
+# =====================================================
+
+def get_gaba_conductance():
+    """
+    Return baseline maximal GABA_A synaptic conductance.
+    """
+    return G_GABA_MAX
+
+
+def get_gaba_decay_constants():
+    """
+    Return inhibitory decay constants.
+
+    Useful for mono- or bi-exponential inhibitory synapse models.
+    """
+    return {
+        "fast_min_ms": TAU_GABA_FAST_MIN,
+        "fast_max_ms": TAU_GABA_FAST_MAX,
+        "slow_ms": TAU_GABA_SLOW,
+    }
+
+
+# =====================================================
+# SCOPE ENFORCEMENT (COLLABORATION SAFETY)
+# =====================================================
+
+def validate_inhibitory_scope():
+    """
+    Guardrail to ensure no excitatory parameters are added.
+    Raises an error if forbidden keywords are detected.
+    """
+    forbidden = ["ampa", "nmda", "excitatory", "glutamate"]
+
+    for name in globals():
+        for word in forbidden:
+            if word in name.lower():
+                raise RuntimeError(
+                    f"Forbidden excitatory parameter detected: {name}"
+                )
+
+    return True
+
+mkdir inhibitory
+
+# Move or create files
+touch inhibitory/README.md
+touch inhibitory/inhibitory_baseline_params.md
+touch inhibitory/inhibitory_params.py
+
+# Add everything
+git add inhibitory/
+git commit -m "Add inhibitory baseline parameters and executable inhibitory module"
+git push
+
+
+
+
+
