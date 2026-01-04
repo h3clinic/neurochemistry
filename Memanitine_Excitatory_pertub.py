@@ -255,7 +255,7 @@ filename = 'excitatory_suppression_results.png'
 plt.savefig(filename, dpi=300, bbox_inches='tight')
 print(f"✓ Figure saved as {filename}")
 
-# Displaying the
+# Displaying the plot
 plt.show()
 
 print("\n✓ Script finished successfully")
