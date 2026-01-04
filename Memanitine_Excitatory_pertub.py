@@ -5,16 +5,16 @@ Simulates NMDA-mediated excitatory synaptic transmission
 and applies a conductance reduction to model memantine effect.
 """
 
-# Silence non-critical warnings to keep output clean
+###
 import warnings
 warnings.filterwarnings('ignore')
 
-# Print a clean header for readability
+# Header Printing
 print("\n" + "=" * 70)
 print("EXCITATORY SUPPRESSION MODEL")
 print("=" * 70 + "\n")
 
-# Import core simulation and analysis libraries
+# libraries importing
 print("Importing libraries...")
 import brian2
 brian2.prefs.codegen.target = 'numpy'
@@ -26,10 +26,10 @@ import matplotlib.pyplot as plt
 
 print("✓ Libraries loaded successfully\n")
 
-# Fix the random seed for reproducibility
+# To fix the random seed for reproducibility
 seed(42)
 
-# Define simulation time resolution
+# Defining the simulation time resolution
 defaultclock.dt = 0.1 * ms
 
 # -------------------------
@@ -53,7 +53,7 @@ print(f"Reduced NMDA conductance:  {g_NMDA_memantine} (-20%)")
 print("=" * 70 + "\n")
 
 # -------------------------
-# MAGNESIUM BLOCK FUNCTION
+# MAGNESIUM BLOCKING FUNCTION
 # -------------------------
 # Voltage-dependent Mg²⁺ block of NMDA receptors
 @check_units(V=volt, result=1)
@@ -61,7 +61,7 @@ def mg_block(V):
     return 1.0 / (1.0 + (1.0 / 3.57) * exp(-0.062 * V / mV))
 
 # -------------------------
-# BASELINE SIMULATION
+# BASELINE SIMULATION  ##**Impt**
 # -------------------------
 print("[1/2] RUNNING BASELINE SIMULATION...\n")
 
@@ -77,10 +77,10 @@ neuron_base = NeuronGroup(
     method='euler'
 )
 
-# Initialize membrane potential
+# Initializ the membrane potential
 neuron_base.v = -70 * mV
 
-# Define presynaptic spike times
+# To define the presynaptic spike times
 spike_times = array([100, 300, 500, 700, 900]) * ms
 stimulus_base = SpikeGeneratorGroup(1, zeros(5, dtype=int), spike_times)
 
@@ -93,7 +93,7 @@ tau_decay : second
 g_nmda : siemens
 '''
 
-# Create synapse connecting stimulus to neuron
+# Creating a synapse connecting stimulus to neuron
 syn_base = Synapses(
     stimulus_base,
     neuron_base,
@@ -107,16 +107,16 @@ syn_base.g_nmda = g_NMDA_baseline
 syn_base.alpha = 1 / (3 * ms)
 syn_base.tau_decay = 100 * ms
 
-# Record membrane voltage and NMDA current
+# To record the membrane voltage and NMDA current ## Flow
 mon_v_base = StateMonitor(neuron_base, 'v', record=True)
 mon_I_base = StateMonitor(syn_base, 'I_NMDA_post', record=True)
 
-# Run baseline simulation
+# To run the baseline simulation
 print("  Running baseline simulation (1 s)...")
 run(1 * second)
 print("  ✓ Baseline complete\n")
 
-# Extract baseline data
+# Extractting the baseline data
 time = mon_v_base.t / ms
 v_base = mon_v_base.v[0] / mV
 I_base = mon_I_base.I_NMDA_post[0] / pA
@@ -129,7 +129,7 @@ print("[2/2] RUNNING REDUCED NMDA SIMULATION...\n")
 # Reset Brian2 internal state
 start_scope()
 
-# Recreate neuron
+# To Recreate a  neuron
 neuron_mem = NeuronGroup(
     1,
     '''
@@ -145,8 +145,9 @@ neuron_mem.v = -70 * mV
 
 # Reuse identical stimulus
 stimulus_mem = SpikeGeneratorGroup(1, zeros(5, dtype=int), spike_times)
-
-# Create synapse with reduced NMDA conductance
+##
+##
+# To create a synapse with reduced NMDA conductance
 syn_mem = Synapses(
     stimulus_mem,
     neuron_mem,
@@ -160,16 +161,16 @@ syn_mem.g_nmda = g_NMDA_memantine
 syn_mem.alpha = 1 / (3 * ms)
 syn_mem.tau_decay = 100 * ms
 
-# Record membrane voltage and NMDA current
+# Recording the  membrane voltage and NMDA current
 mon_v_mem = StateMonitor(neuron_mem, 'v', record=True)
 mon_I_mem = StateMonitor(syn_mem, 'I_NMDA_post', record=True)
 
-# Run reduced-conductance simulation
+# Running the reduced-conductance simulation
 print("  Running reduced NMDA simulation (1 s)...")
 run(1 * second)
 print("  ✓ Reduced NMDA simulation complete\n")
 
-# Extract memantine data
+# Extract memantine data (Drug data0
 v_mem = mon_v_mem.v[0] / mV
 I_mem = mon_I_mem.I_NMDA_post[0] / pA
 
@@ -192,7 +193,7 @@ for spike_t in spike_times / ms:
         peaks_base.append(max(v_base[start_idx:end_idx]) + 70)
         peaks_mem.append(max(v_mem[start_idx:end_idx]) + 70)
 
-# Compute averages and percentage reduction
+# Computing the averages and percentage reduction
 avg_base = np.mean(peaks_base)
 avg_mem = np.mean(peaks_mem)
 reduction = ((avg_base - avg_mem) / avg_base) * 100
@@ -202,7 +203,7 @@ print(f"Reduced EPSP:    {avg_mem:.2f} mV")
 print(f"Observed drop:   {reduction:.1f}%\n")
 
 # -------------------------
-# VISUALIZATION
+# VISUALIZATION PART
 # -------------------------
 print("=" * 70)
 print("GENERATING FIGURE")
@@ -249,12 +250,12 @@ ax3.grid(True, axis='y', alpha=0.3)
 
 plt.tight_layout()
 
-# Save output figure
+# To Save the output figure
 filename = 'excitatory_suppression_results.png'
 plt.savefig(filename, dpi=300, bbox_inches='tight')
 print(f"✓ Figure saved as {filename}")
 
-# Display plot
+# Displaying the
 plt.show()
 
 print("\n✓ Script finished successfully")
